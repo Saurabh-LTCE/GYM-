@@ -1,0 +1,23 @@
+/**
+ * Gym Management — design tokens (reusable across components)
+ */
+:root {
+  --color-primary: #e53935;
+  --color-primary-dark: #c62828;
+  --color-primary-light: #ffebee;
+  --color-secondary: #ffffff;
+  --color-bg: #f5f5f5;
+  --color-bg-elevated: #ffffff;
+  --color-text: #212121;
+  --color-text-muted: #616161;
+  --color-border: #e0e0e0;
+  --color-table-stripe: #fafafa;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.1);
+  --shadow-nav: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --sidebar-width: 260px;
+  --font: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition: 0.2s ease;
+}

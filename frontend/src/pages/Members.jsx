@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import Table from '../components/Table';
 import { useFetch } from '../hooks/useFetch';
-import { API_PATHS, trainersService } from '../services/api';
+import { API_PATHS, membersService } from '../services/api';
 
 const initialForm = {
   name: '',
   email: '',
   phone: '',
-  specialization: '',
+  membershipType: 'Monthly',
   status: 'Active',
 };
 
-const TrainersPage = () => {
-  const { data, loading, error, refetch } = useFetch(API_PATHS.trainers);
+const MembersPage = () => {
+  const { data, loading, error, refetch } = useFetch(API_PATHS.members);
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -29,16 +29,16 @@ const TrainersPage = () => {
     setSaving(true);
     try {
       if (editingId) {
-        await trainersService.update(editingId, form);
+        await membersService.update(editingId, form);
       } else {
-        await trainersService.create(form);
+        await membersService.create(form);
       }
       setForm(initialForm);
       setEditingId(null);
       await refetch();
     } catch (err) {
       console.error(err);
-      alert('Could not save trainer.');
+      alert('Could not save member. Check the console.');
     } finally {
       setSaving(false);
     }
@@ -49,20 +49,20 @@ const TrainersPage = () => {
       name: row.name,
       email: row.email,
       phone: row.phone,
-      specialization: row.specialization,
+      membershipType: row.membershipType,
       status: row.status,
     });
     setEditingId(row._id);
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this trainer?')) return;
+    if (!window.confirm('Delete this member?')) return;
     try {
-      await trainersService.remove(id);
+      await membersService.remove(id);
       await refetch();
     } catch (err) {
       console.error(err);
-      alert('Could not delete trainer.');
+      alert('Could not delete member.');
     }
   };
 
@@ -70,13 +70,13 @@ const TrainersPage = () => {
     { key: 'name', header: 'Name' },
     { key: 'email', header: 'Email' },
     { key: 'phone', header: 'Phone' },
-    { key: 'specialization', header: 'Specialization' },
+    { key: 'membershipType', header: 'Plan' },
     { key: 'status', header: 'Status' },
     {
-      key: 'joinedOn',
+      key: 'joinDate',
       header: 'Joined',
       render: (row) =>
-        row.joinedOn ? new Date(row.joinedOn).toLocaleDateString() : '—',
+        row.joinDate ? new Date(row.joinDate).toLocaleDateString() : '—',
     },
     {
       key: '_actions',
@@ -104,25 +104,25 @@ const TrainersPage = () => {
 
   return (
     <div>
-      <h1 className="page-title">Trainers</h1>
+      <h1 className="page-title">Members</h1>
       <p className="page-desc">
-        Data from <code>GET /api/trainers</code>. Full CRUD against the same API.
+        Loaded with <code>GET /api/members</code>. Add, edit, or remove records.
       </p>
 
       {error && (
         <div className="error-banner" role="alert">
-          Failed to load trainers.
+          Failed to load members. Is the backend running?
         </div>
       )}
 
       <section className="form-panel">
-        <h2>{editingId ? 'Edit trainer' : 'Add trainer'}</h2>
+        <h2>{editingId ? 'Edit member' : 'Add member'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
             <div className="form-field">
-              <label htmlFor="t-name">Name</label>
+              <label htmlFor="m-name">Name</label>
               <input
-                id="t-name"
+                id="m-name"
                 name="name"
                 value={form.name}
                 onChange={handleChange}
@@ -130,9 +130,9 @@ const TrainersPage = () => {
               />
             </div>
             <div className="form-field">
-              <label htmlFor="t-email">Email</label>
+              <label htmlFor="m-email">Email</label>
               <input
-                id="t-email"
+                id="m-email"
                 type="email"
                 name="email"
                 value={form.email}
@@ -141,9 +141,9 @@ const TrainersPage = () => {
               />
             </div>
             <div className="form-field">
-              <label htmlFor="t-phone">Phone</label>
+              <label htmlFor="m-phone">Phone</label>
               <input
-                id="t-phone"
+                id="m-phone"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
@@ -151,19 +151,22 @@ const TrainersPage = () => {
               />
             </div>
             <div className="form-field">
-              <label htmlFor="t-spec">Specialization</label>
-              <input
-                id="t-spec"
-                name="specialization"
-                value={form.specialization}
+              <label htmlFor="m-plan">Membership</label>
+              <select
+                id="m-plan"
+                name="membershipType"
+                value={form.membershipType}
                 onChange={handleChange}
-                required
-              />
+              >
+                <option value="Monthly">Monthly</option>
+                <option value="Quarterly">Quarterly</option>
+                <option value="Yearly">Yearly</option>
+              </select>
             </div>
             <div className="form-field">
-              <label htmlFor="t-status">Status</label>
+              <label htmlFor="m-status">Status</label>
               <select
-                id="t-status"
+                id="m-status"
                 name="status"
                 value={form.status}
                 onChange={handleChange}
@@ -194,16 +197,16 @@ const TrainersPage = () => {
       </section>
 
       {loading ? (
-        <div className="loading">Loading trainers…</div>
+        <div className="loading">Loading members…</div>
       ) : (
         <Table
           columns={columns}
           data={rows}
-          emptyMessage="No trainers yet."
+          emptyMessage="No members yet. Add one above."
         />
       )}
     </div>
   );
 };
 
-export default TrainersPage;
+export default MembersPage;

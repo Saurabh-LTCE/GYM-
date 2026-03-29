@@ -1,59 +1,74 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+import React from 'react';
+import Card from '../components/Card';
+import { IconMembers, IconTrainers, IconFees } from '../components/Icons';
+import { useFetch } from '../hooks/useFetch';
+import { API_PATHS } from '../services/api';
 
 const Dashboard = () => {
-  const [summary, setSummary] = useState({
-    members: 0,
-    trainers: 0,
-    fees: 0,
-  });
-  const [loading, setLoading] = useState(true);
+  const membersQ = useFetch(API_PATHS.members);
+  const trainersQ = useFetch(API_PATHS.trainers);
+  const feesQ = useFetch(API_PATHS.fees);
 
-  useEffect(() => {
-    const fetchSummary = async () => {
-      try {
-        const [trainersRes, feesRes] = await Promise.all([
-          axios.get(`${API_BASE_URL}/api/trainers`),
-          axios.get(`${API_BASE_URL}/api/fees`),
-        ]);
+  const loading =
+    membersQ.loading || trainersQ.loading || feesQ.loading;
+  const hasError =
+    membersQ.error || trainersQ.error || feesQ.error;
 
-        setSummary({
-          members: 0, // Members page/file is not present yet
-          trainers: trainersRes.data.length,
-          fees: feesRes.data.length,
-        });
-      } catch (error) {
-        console.error('Error fetching dashboard summary', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSummary();
-  }, []);
-
-  if (loading) {
-    return <div>Loading dashboard...</div>;
-  }
+  const memberCount = Array.isArray(membersQ.data) ? membersQ.data.length : 0;
+  const trainerCount = Array.isArray(trainersQ.data)
+    ? trainersQ.data.length
+    : 0;
+  const feeCount = Array.isArray(feesQ.data) ? feesQ.data.length : 0;
 
   return (
-    <div>
-      <h1>Gym Dashboard</h1>
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-        <div>
-          <h2>Trainers</h2>
-          <p>Total: {summary.trainers}</p>
-          <Link to="/trainers">View Trainers</Link>
+    <div className="dashboard-page">
+      <header className="dashboard-page__header">
+        <h1 className="page-title">Dashboard</h1>
+        <p className="page-desc">
+          Quick overview of your gym. Data loads from members, trainers, and
+          fees APIs.
+        </p>
+      </header>
+
+      {loading && (
+        <div className="loading" role="status">
+          Loading statistics…
         </div>
-        <div>
-          <h2>Fees</h2>
-          <p>Total Records: {summary.fees}</p>
-          <Link to="/fees">View Fees</Link>
+      )}
+      {hasError && (
+        <div className="error-banner" role="alert">
+          Could not load some data. Ensure the API is running and{' '}
+          <code className="error-banner__code">VITE_API_BASE_URL</code> is set,
+          or use the dev proxy for <code className="error-banner__code">/api</code>.
         </div>
-      </div>
+      )}
+
+      <section className="stat-grid" aria-label="Summary statistics">
+        <Card
+          icon={<IconMembers />}
+          title="Total Members"
+          value={loading ? '—' : memberCount}
+          hint="Registered gym members"
+          to="/members"
+          linkLabel="Manage members"
+        />
+        <Card
+          icon={<IconTrainers />}
+          title="Total Trainers"
+          value={loading ? '—' : trainerCount}
+          hint="Coaching staff"
+          to="/trainers"
+          linkLabel="Manage trainers"
+        />
+        <Card
+          icon={<IconFees />}
+          title="Total Fees"
+          value={loading ? '—' : feeCount}
+          hint="Fee records in the system"
+          to="/fees"
+          linkLabel="Manage fees"
+        />
+      </section>
     </div>
   );
 };

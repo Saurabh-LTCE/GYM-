@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useMemo } from 'react';
+import Table from '../components/Table';
+import { useFetch } from '../hooks/useFetch';
+import { API_PATHS, feesService } from '../services/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-
-const initialFormState = {
+const initialForm = {
   member: '',
   amount: '',
   status: 'Pending',
@@ -11,223 +11,249 @@ const initialFormState = {
   paidOn: '',
 };
 
-const Fees = () => {
-  const [fees, setFees] = useState([]);
-  const [members, setMembers] = useState([]);
-  const [form, setForm] = useState(initialFormState);
+const FeesPage = () => {
+  const feesQ = useFetch(API_PATHS.fees);
+  const membersQ = useFetch(API_PATHS.members);
+
+  const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const fetchData = async () => {
-    try {
-      const [feesRes /*, membersRes */] = await Promise.all([
-        axios.get(`${API_BASE_URL}/api/fees`),
-        // Members endpoint not wired in frontend structure yet
-      ]);
-      setFees(feesRes.data);
-      setMembers([]); // Placeholder until members page/file exists
-    } catch (error) {
-      console.error('Error fetching fees', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const feeRows = Array.isArray(feesQ.data) ? feesQ.data : [];
+  const memberOptions = useMemo(
+    () => (Array.isArray(membersQ.data) ? membersQ.data : []),
+    [membersQ.data]
+  );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const refreshAll = async () => {
+    await Promise.all([feesQ.refetch(), membersQ.refetch()]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (!form.member) {
+      alert('Please select a member.');
+      return;
+    }
+    setSaving(true);
     const payload = {
-      member: form.member || undefined,
+      member: form.member,
       amount: Number(form.amount),
       status: form.status,
       dueDate: form.dueDate || undefined,
       paidOn: form.paidOn || undefined,
     };
-
     try {
       if (editingId) {
-        const res = await axios.put(
-          `${API_BASE_URL}/api/fees/${editingId}`,
-          payload
-        );
-        setFees((prev) =>
-          prev.map((f) => (f._id === editingId ? res.data : f))
-        );
+        await feesService.update(editingId, payload);
       } else {
-        const res = await axios.post(
-          `${API_BASE_URL}/api/fees`,
-          payload
-        );
-        setFees((prev) => [res.data, ...prev]);
+        await feesService.create(payload);
       }
-      setForm(initialFormState);
+      setForm(initialForm);
       setEditingId(null);
-    } catch (error) {
-      console.error('Error saving fee', error);
+      await refreshAll();
+    } catch (err) {
+      console.error(err);
+      alert('Could not save fee record.');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleEdit = (fee) => {
+  const handleEdit = (row) => {
     setForm({
-      member: fee.member?._id || '',
-      amount: fee.amount,
-      status: fee.status,
-      dueDate: fee.dueDate ? fee.dueDate.slice(0, 10) : '',
-      paidOn: fee.paidOn ? fee.paidOn.slice(0, 10) : '',
+      member: row.member?._id || row.member || '',
+      amount: row.amount,
+      status: row.status,
+      dueDate: row.dueDate ? String(row.dueDate).slice(0, 10) : '',
+      paidOn: row.paidOn ? String(row.paidOn).slice(0, 10) : '',
     });
-    setEditingId(fee._id);
+    setEditingId(row._id);
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this fee record?')) return;
+    if (!window.confirm('Delete this fee record?')) return;
     try {
-      await axios.delete(`${API_BASE_URL}/api/fees/${id}`);
-      setFees((prev) => prev.filter((f) => f._id !== id));
-    } catch (error) {
-      console.error('Error deleting fee', error);
+      await feesService.remove(id);
+      await feesQ.refetch();
+    } catch (err) {
+      console.error(err);
+      alert('Could not delete fee.');
     }
   };
 
-  return (
-    <div>
-      <h1>Fees</h1>
+  const loading = feesQ.loading || membersQ.loading;
+  const listError = feesQ.error || membersQ.error;
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
-        <h2>{editingId ? 'Edit Fee Record' : 'Add Fee Record'}</h2>
-        <div>
-          <label>
-            Member (ID):{' '}
-            <input
-              name="member"
-              value={form.member}
-              onChange={handleChange}
-              placeholder="Member ObjectId"
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            Amount:{' '}
-            <input
-              type="number"
-              min="0"
-              name="amount"
-              value={form.amount}
-              onChange={handleChange}
-              required
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            Status:{' '}
-            <select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-            >
-              <option value="Pending">Pending</option>
-              <option value="Paid">Paid</option>
-              <option value="Overdue">Overdue</option>
-            </select>
-          </label>
-        </div>
-        <div>
-          <label>
-            Due Date:{' '}
-            <input
-              type="date"
-              name="dueDate"
-              value={form.dueDate}
-              onChange={handleChange}
-              required
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            Paid On:{' '}
-            <input
-              type="date"
-              name="paidOn"
-              value={form.paidOn}
-              onChange={handleChange}
-            />
-          </label>
-        </div>
-        <button type="submit">
-          {editingId ? 'Update Fee' : 'Add Fee'}
-        </button>
-        {editingId && (
+  const columns = [
+    {
+      key: 'member',
+      header: 'Member',
+      render: (row) => {
+        const m = row.member;
+        if (m && typeof m === 'object') {
+          return `${m.name ?? ''} (${m.email ?? ''})`.trim() || '—';
+        }
+        return m || '—';
+      },
+    },
+    { key: 'amount', header: 'Amount' },
+    { key: 'status', header: 'Status' },
+    {
+      key: 'dueDate',
+      header: 'Due',
+      render: (row) =>
+        row.dueDate ? new Date(row.dueDate).toLocaleDateString() : '—',
+    },
+    {
+      key: 'paidOn',
+      header: 'Paid on',
+      render: (row) =>
+        row.paidOn ? new Date(row.paidOn).toLocaleDateString() : '—',
+    },
+    {
+      key: '_actions',
+      header: 'Actions',
+      render: (row) => (
+        <div className="form-actions">
           <button
             type="button"
-            onClick={() => {
-              setForm(initialFormState);
-              setEditingId(null);
-            }}
-            style={{ marginLeft: '0.5rem' }}
+            className="btn btn--ghost btn--sm"
+            onClick={() => handleEdit(row)}
           >
-            Cancel
+            Edit
           </button>
-        )}
-      </form>
+          <button
+            type="button"
+            className="btn btn--danger btn--sm"
+            onClick={() => handleDelete(row._id)}
+          >
+            Delete
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div>
+      <h1 className="page-title">Fees</h1>
+      <p className="page-desc">
+        List from <code>GET /api/fees</code>. Members load from{' '}
+        <code>GET /api/members</code> for the dropdown.
+      </p>
+
+      {listError && (
+        <div className="error-banner" role="alert">
+          Failed to load data. Check API and CORS.
+        </div>
+      )}
+
+      <section className="form-panel">
+        <h2>{editingId ? 'Edit fee' : 'Add fee'}</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-grid">
+            <div className="form-field">
+              <label htmlFor="f-member">Member</label>
+              <select
+                id="f-member"
+                name="member"
+                value={form.member}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select member</option>
+                {memberOptions.map((m) => (
+                  <option key={m._id} value={m._id}>
+                    {m.name} — {m.email}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-field">
+              <label htmlFor="f-amount">Amount</label>
+              <input
+                id="f-amount"
+                type="number"
+                min="0"
+                step="0.01"
+                name="amount"
+                value={form.amount}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="f-status">Status</label>
+              <select
+                id="f-status"
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+              >
+                <option value="Pending">Pending</option>
+                <option value="Paid">Paid</option>
+                <option value="Overdue">Overdue</option>
+              </select>
+            </div>
+            <div className="form-field">
+              <label htmlFor="f-due">Due date</label>
+              <input
+                id="f-due"
+                type="date"
+                name="dueDate"
+                value={form.dueDate}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="f-paid">Paid on</label>
+              <input
+                id="f-paid"
+                type="date"
+                name="paidOn"
+                value={form.paidOn}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+          <div className="form-actions">
+            <button type="submit" className="btn btn--primary" disabled={saving}>
+              {saving ? 'Saving…' : editingId ? 'Update' : 'Add'}
+            </button>
+            {editingId && (
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={() => {
+                  setForm(initialForm);
+                  setEditingId(null);
+                }}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
+      </section>
 
       {loading ? (
-        <div>Loading fees...</div>
+        <div className="loading">Loading fees…</div>
       ) : (
-        <table border="1" cellPadding="6" cellSpacing="0">
-          <thead>
-            <tr>
-              <th>Member</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Due Date</th>
-              <th>Paid On</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {fees.map((f) => (
-              <tr key={f._id}>
-                <td>
-                  {f.member
-                    ? `${f.member.name || f.member} `
-                    : 'N/A'}
-                </td>
-                <td>{f.amount}</td>
-                <td>{f.status}</td>
-                <td>{f.dueDate ? new Date(f.dueDate).toLocaleDateString() : '-'}</td>
-                <td>{f.paidOn ? new Date(f.paidOn).toLocaleDateString() : '-'}</td>
-                <td>
-                  <button onClick={() => handleEdit(f)}>Edit</button>
-                  <button
-                    onClick={() => handleDelete(f._id)}
-                    style={{ marginLeft: '0.5rem' }}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {fees.length === 0 && (
-              <tr>
-                <td colSpan="6">No fee records found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <Table
+          columns={columns}
+          data={feeRows}
+          emptyMessage="No fee records. Create members first if the list is empty."
+        />
       )}
     </div>
   );
 };
 
-export default Fees;
+export default FeesPage;

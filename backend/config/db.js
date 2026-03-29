@@ -10,7 +10,7 @@ const connectDB = async () => {
     const conn = await mongoose.connect(mongoUri, {
       // Add options here if needed (e.g., ssl settings for Atlas/Azure)
     });
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`✅MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error('MongoDB connection error:', error.message);
     process.exit(1); // Exit process with failure
