@@ -3,9 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-const memberRoutes = require('./routes/memberRoutes');
-const trainerRoutes = require('./routes/trainerRoutes');
-const feeRoutes = require('./routes/feeRoutes');
+const memberRoutes = require('./routes/memberRoutes.js');
+const trainerRoutes = require('./routes/trainerRoutes.js');
+const feeRoutes = require('./routes/feeRoutes.js');
 
 const app = express();
 
