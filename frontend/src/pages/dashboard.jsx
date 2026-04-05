@@ -32,14 +32,18 @@ const Dashboard = () => {
 
       {loading && (
         <div className="loading" role="status">
-          Loading statistics…
+          Loading statistics...
         </div>
       )}
       {hasError && (
         <div className="error-banner" role="alert">
-          Could not load some data. Ensure the API is running and{' '}
-          <code className="error-banner__code">VITE_API_BASE_URL</code> is set,
-          or use the dev proxy for <code className="error-banner__code">/api</code>.
+          Could not load some data. In production, set{' '}
+          <code className="error-banner__code">VITE_API_URL</code> on Vercel to
+          your Render API URL. For local dev, use{' '}
+          <code className="error-banner__code">VITE_API_URL</code> or{' '}
+          <code className="error-banner__code">VITE_DEV_PROXY_TARGET</code>.{' '}
+          See <code className="error-banner__code">.env.example</code> for
+          examples.
         </div>
       )}
 
@@ -47,7 +51,7 @@ const Dashboard = () => {
         <Card
           icon={<IconMembers />}
           title="Total Members"
-          value={loading ? '—' : memberCount}
+          value={loading ? '-' : memberCount}
           hint="Registered gym members"
           to="/members"
           linkLabel="Manage members"
@@ -55,7 +59,7 @@ const Dashboard = () => {
         <Card
           icon={<IconTrainers />}
           title="Total Trainers"
-          value={loading ? '—' : trainerCount}
+          value={loading ? '-' : trainerCount}
           hint="Coaching staff"
           to="/trainers"
           linkLabel="Manage trainers"
@@ -63,7 +67,7 @@ const Dashboard = () => {
         <Card
           icon={<IconFees />}
           title="Total Fees"
-          value={loading ? '—' : feeCount}
+          value={loading ? '-' : feeCount}
           hint="Fee records in the system"
           to="/fees"
           linkLabel="Manage fees"
