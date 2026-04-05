@@ -5,7 +5,7 @@ const {
   getMemberById,
   updateMember,
   deleteMember,
-} = require('../controllers/memberController');
+} = require('../controllers/memberController.js');
 
 const router = express.Router();
 

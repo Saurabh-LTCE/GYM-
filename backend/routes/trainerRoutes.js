@@ -5,7 +5,7 @@ const {
   getTrainerById,
   updateTrainer,
   deleteTrainer,
-} = require('../controllers/trainerController');
+} = require('../controllers/trainerController.js');
 
 const router = express.Router();
 
