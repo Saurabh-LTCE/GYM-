@@ -1,4 +1,4 @@
-const Trainer = require('../models/Trainer');
+const Trainer = require('../models/Trainer.js');
 
 // Create trainer
 exports.createTrainer = async (req, res, next) => {

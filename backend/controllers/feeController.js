@@ -1,4 +1,4 @@
-const Fee = require('../models/Fee');
+const Fee = require('../models/Fee.js');
 
 // Create fee record
 exports.createFee = async (req, res, next) => {
