@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Layout from '../components/Layout';
+import Layout from '../components/Layout.jsx';
 import Dashboard from '../pages/Dashboard.jsx';
 import Members from '../pages/Members.jsx';
 import Trainers from '../pages/Trainers.jsx';
