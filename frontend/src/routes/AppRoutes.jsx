@@ -1,10 +1,10 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from '../components/Layout';
-import Dashboard from '../pages/Dashboard';
-import Members from '../pages/Members';
-import Trainers from '../pages/Trainers';
-import Fees from '../pages/Fees';
+import Dashboard from '../pages/Dashboard.jsx';
+import Members from '../pages/Members.jsx';
+import Trainers from '../pages/Trainers.jsx';
+import Fees from '../pages/Fees.jsx';
 
 const AppRoutes = () => (
   <Routes>
