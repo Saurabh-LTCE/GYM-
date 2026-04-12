@@ -13,7 +13,11 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+// ✅ Correct CORS placement
+app.use(cors({
+  origin: "https://gym07.vercel.app",
+  credentials: true
+}));
 app.use(express.json());
 
 // API routes
@@ -40,6 +44,3 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-app.use(cors({
-  origin: process.env.CLIENT_URL
-}));
