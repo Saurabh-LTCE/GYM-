@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
  * @param {React.ReactNode} [props.icon] — optional icon node
  */
 const Card = ({ title, value, hint, to, linkLabel = 'View', icon }) => (
-  <article className="stat-card">
+  <article className="stat-card brutal-card">
     <div className="stat-card__top">
       {icon && <div className="stat-card__icon-wrap">{icon}</div>}
       <div className="stat-card__body">

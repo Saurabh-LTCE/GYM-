@@ -1,5 +1,5 @@
 /**
- * Responsive layout — sidebar becomes horizontal strip on small screens.
+ * Responsive layout — sidebar stacks on small screens.
  */
 @media (max-width: 900px) {
   :root {
@@ -18,7 +18,9 @@
     height: auto;
     min-height: auto;
     flex-direction: column;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border-right: none;
+    border-bottom: var(--brutal-border);
+    box-shadow: 0 4px 0 var(--brutal-black);
   }
 
   .sidebar__header {
@@ -26,38 +28,33 @@
   }
 
   .sidebar__nav {
-    padding: 0 0.5rem 0.85rem;
+    padding: 0 0.75rem 1rem;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
   .sidebar__list {
-    display: flex;
+    flex-direction: row;
     flex-wrap: nowrap;
-    gap: 0.35rem;
+    gap: 0.5rem;
     padding-bottom: 0.25rem;
   }
 
   .sidebar__item {
-    margin-bottom: 0;
     flex-shrink: 0;
   }
 
   .sidebar__link {
     white-space: nowrap;
-    border-left: none;
-    border-bottom: 3px solid transparent;
     padding: 0.65rem 0.85rem;
   }
 
   .sidebar__link:hover {
-    transform: none;
+    transform: translate(1px, 1px);
   }
 
   .sidebar__link--active {
-    border-left-color: transparent;
-    border-bottom-color: var(--color-secondary);
-    background: rgba(255, 255, 255, 0.2);
+    transform: translate(1px, 1px);
   }
 
   .app-shell__main-wrap {
@@ -70,36 +67,39 @@
   }
 
   .navbar__title {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
   }
 
   .app-shell__main {
-    padding: 1rem;
+    padding: 1.15rem 1rem 2rem;
   }
 
   .stat-grid {
     grid-template-columns: 1fr;
   }
 
-  .data-table {
+  .data-table,
+  .brutal-table {
     min-width: 100%;
     font-size: 0.8125rem;
   }
 
   .data-table th,
-  .data-table td {
+  .data-table td,
+  .brutal-table th,
+  .brutal-table td {
     padding: 0.65rem 0.75rem;
   }
 
   .page-title {
-    font-size: 1.45rem;
+    font-size: 1.6rem;
   }
 }
 
 @media (max-width: 480px) {
   .navbar__icon-wrap {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 
   .form-grid {

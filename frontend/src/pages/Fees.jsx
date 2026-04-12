@@ -123,14 +123,14 @@ const FeesPage = () => {
         <div className="form-actions">
           <button
             type="button"
-            className="btn btn--ghost btn--sm"
+            className="brutal-button brutal-button--ghost brutal-button--sm"
             onClick={() => handleEdit(row)}
           >
             Edit
           </button>
           <button
             type="button"
-            className="btn btn--danger btn--sm"
+            className="brutal-button brutal-button--danger brutal-button--sm"
             onClick={() => handleDelete(row._id)}
           >
             Delete
@@ -141,7 +141,7 @@ const FeesPage = () => {
   ];
 
   return (
-    <div>
+    <div className="page-shell">
       <h1 className="page-title">Fees</h1>
       <p className="page-desc">
         List from <code>GET /api/fees</code>. Members load from{' '}
@@ -154,7 +154,7 @@ const FeesPage = () => {
         </div>
       )}
 
-      <section className="form-panel">
+      <section className="form-panel brutal-card">
         <h2>{editingId ? 'Edit fee' : 'Add fee'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
@@ -162,6 +162,7 @@ const FeesPage = () => {
               <label htmlFor="f-member">Member</label>
               <select
                 id="f-member"
+                className="brutal-input"
                 name="member"
                 value={form.member}
                 onChange={handleChange}
@@ -179,6 +180,7 @@ const FeesPage = () => {
               <label htmlFor="f-amount">Amount</label>
               <input
                 id="f-amount"
+                className="brutal-input"
                 type="number"
                 min="0"
                 step="0.01"
@@ -192,6 +194,7 @@ const FeesPage = () => {
               <label htmlFor="f-status">Status</label>
               <select
                 id="f-status"
+                className="brutal-input"
                 name="status"
                 value={form.status}
                 onChange={handleChange}
@@ -205,6 +208,7 @@ const FeesPage = () => {
               <label htmlFor="f-due">Due date</label>
               <input
                 id="f-due"
+                className="brutal-input"
                 type="date"
                 name="dueDate"
                 value={form.dueDate}
@@ -216,6 +220,7 @@ const FeesPage = () => {
               <label htmlFor="f-paid">Paid on</label>
               <input
                 id="f-paid"
+                className="brutal-input"
                 type="date"
                 name="paidOn"
                 value={form.paidOn}
@@ -224,13 +229,17 @@ const FeesPage = () => {
             </div>
           </div>
           <div className="form-actions">
-            <button type="submit" className="btn btn--primary" disabled={saving}>
+            <button
+              type="submit"
+              className="brutal-button brutal-button--primary"
+              disabled={saving}
+            >
               {saving ? 'Saving…' : editingId ? 'Update' : 'Add'}
             </button>
             {editingId && (
               <button
                 type="button"
-                className="btn btn--ghost"
+                className="brutal-button brutal-button--ghost"
                 onClick={() => {
                   setForm(initialForm);
                   setEditingId(null);

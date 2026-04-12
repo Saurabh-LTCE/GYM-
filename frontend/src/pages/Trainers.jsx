@@ -85,14 +85,14 @@ const TrainersPage = () => {
         <div className="form-actions">
           <button
             type="button"
-            className="btn btn--ghost btn--sm"
+            className="brutal-button brutal-button--ghost brutal-button--sm"
             onClick={() => handleEdit(row)}
           >
             Edit
           </button>
           <button
             type="button"
-            className="btn btn--danger btn--sm"
+            className="brutal-button brutal-button--danger brutal-button--sm"
             onClick={() => handleDelete(row._id)}
           >
             Delete
@@ -103,7 +103,7 @@ const TrainersPage = () => {
   ];
 
   return (
-    <div>
+    <div className="page-shell">
       <h1 className="page-title">Trainers</h1>
       <p className="page-desc">
         Data from <code>GET /api/trainers</code>. Full CRUD against the same API.
@@ -115,7 +115,7 @@ const TrainersPage = () => {
         </div>
       )}
 
-      <section className="form-panel">
+      <section className="form-panel brutal-card">
         <h2>{editingId ? 'Edit trainer' : 'Add trainer'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
@@ -123,6 +123,7 @@ const TrainersPage = () => {
               <label htmlFor="t-name">Name</label>
               <input
                 id="t-name"
+                className="brutal-input"
                 name="name"
                 value={form.name}
                 onChange={handleChange}
@@ -133,6 +134,7 @@ const TrainersPage = () => {
               <label htmlFor="t-email">Email</label>
               <input
                 id="t-email"
+                className="brutal-input"
                 type="email"
                 name="email"
                 value={form.email}
@@ -144,6 +146,7 @@ const TrainersPage = () => {
               <label htmlFor="t-phone">Phone</label>
               <input
                 id="t-phone"
+                className="brutal-input"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
@@ -154,6 +157,7 @@ const TrainersPage = () => {
               <label htmlFor="t-spec">Specialization</label>
               <input
                 id="t-spec"
+                className="brutal-input"
                 name="specialization"
                 value={form.specialization}
                 onChange={handleChange}
@@ -164,6 +168,7 @@ const TrainersPage = () => {
               <label htmlFor="t-status">Status</label>
               <select
                 id="t-status"
+                className="brutal-input"
                 name="status"
                 value={form.status}
                 onChange={handleChange}
@@ -174,13 +179,17 @@ const TrainersPage = () => {
             </div>
           </div>
           <div className="form-actions">
-            <button type="submit" className="btn btn--primary" disabled={saving}>
+            <button
+              type="submit"
+              className="brutal-button brutal-button--primary"
+              disabled={saving}
+            >
               {saving ? 'Saving…' : editingId ? 'Update' : 'Add'}
             </button>
             {editingId && (
               <button
                 type="button"
-                className="btn btn--ghost"
+                className="brutal-button brutal-button--ghost"
                 onClick={() => {
                   setForm(initialForm);
                   setEditingId(null);

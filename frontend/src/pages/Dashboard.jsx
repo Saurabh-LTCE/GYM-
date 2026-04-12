@@ -21,7 +21,7 @@ const Dashboard = () => {
   const feeCount = Array.isArray(feesQ.data) ? feesQ.data.length : 0;
 
   return (
-    <div className="dashboard-page">
+    <div className="dashboard-page page-shell">
       <header className="dashboard-page__header">
         <h1 className="page-title">Dashboard</h1>
         <p className="page-desc">

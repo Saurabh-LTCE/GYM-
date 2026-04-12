@@ -1,23 +1,39 @@
 /**
- * Gym Management — design tokens (reusable across components)
+ * Neobrutalism design tokens
  */
 :root {
-  --color-primary: #e53935;
-  --color-primary-dark: #c62828;
-  --color-primary-light: #ffebee;
+  --brutal-black: #0a0a0a;
+  --brutal-border-width: 3px;
+  --brutal-border: var(--brutal-border-width) solid var(--brutal-black);
+  --brutal-shadow: 4px 4px 0 var(--brutal-black);
+  --brutal-shadow-sm: 2px 2px 0 var(--brutal-black);
+  --brutal-shadow-hover: 2px 2px 0 var(--brutal-black);
+
+  --color-accent-yellow: #ffef3d;
+  --color-accent-pink: #ff6b9d;
+  --color-accent-blue: #5eb3f6;
+  --color-accent-green: #5ee787;
+  --color-accent-lavender: #d4c5f9;
+
+  --color-primary: var(--brutal-black);
+  --color-primary-dark: #000;
+  --color-primary-light: #fff59d;
   --color-secondary: #ffffff;
-  --color-bg: #f5f5f5;
+  --color-bg: #e8e4f0;
   --color-bg-elevated: #ffffff;
-  --color-text: #212121;
-  --color-text-muted: #616161;
-  --color-border: #e0e0e0;
-  --color-table-stripe: #fafafa;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.1);
-  --shadow-nav: 0 2px 12px rgba(0, 0, 0, 0.08);
-  --radius: 12px;
-  --radius-sm: 8px;
+  --color-text: var(--brutal-black);
+  --color-text-muted: #2d2d2d;
+  --color-border: var(--brutal-black);
+  --color-table-stripe: #f5f2ff;
+  --color-table-head: var(--color-accent-yellow);
+
+  --shadow-sm: var(--brutal-shadow-sm);
+  --shadow-md: var(--brutal-shadow);
+  --shadow-nav: var(--brutal-shadow);
+
+  --radius: 2px;
+  --radius-sm: 2px;
   --sidebar-width: 260px;
-  --font: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --transition: 0.2s ease;
+  --font: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition: 0.12s ease;
 }

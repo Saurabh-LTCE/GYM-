@@ -20,7 +20,7 @@ const Table = ({ columns, data, rowKey = '_id', emptyMessage = 'No rows to displ
 
   return (
     <div className="table-wrap">
-      <table className="data-table">
+      <table className="data-table brutal-table">
         <thead>
           <tr>
             {columns.map((col) => (

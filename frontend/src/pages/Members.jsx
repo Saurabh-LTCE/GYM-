@@ -85,14 +85,14 @@ const MembersPage = () => {
         <div className="form-actions">
           <button
             type="button"
-            className="btn btn--ghost btn--sm"
+            className="brutal-button brutal-button--ghost brutal-button--sm"
             onClick={() => handleEdit(row)}
           >
             Edit
           </button>
           <button
             type="button"
-            className="btn btn--danger btn--sm"
+            className="brutal-button brutal-button--danger brutal-button--sm"
             onClick={() => handleDelete(row._id)}
           >
             Delete
@@ -103,7 +103,7 @@ const MembersPage = () => {
   ];
 
   return (
-    <div>
+    <div className="page-shell">
       <h1 className="page-title">Members</h1>
       <p className="page-desc">
         Loaded with <code>GET /api/members</code>. Add, edit, or remove records.
@@ -115,7 +115,7 @@ const MembersPage = () => {
         </div>
       )}
 
-      <section className="form-panel">
+      <section className="form-panel brutal-card">
         <h2>{editingId ? 'Edit member' : 'Add member'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
@@ -123,6 +123,7 @@ const MembersPage = () => {
               <label htmlFor="m-name">Name</label>
               <input
                 id="m-name"
+                className="brutal-input"
                 name="name"
                 value={form.name}
                 onChange={handleChange}
@@ -133,6 +134,7 @@ const MembersPage = () => {
               <label htmlFor="m-email">Email</label>
               <input
                 id="m-email"
+                className="brutal-input"
                 type="email"
                 name="email"
                 value={form.email}
@@ -144,6 +146,7 @@ const MembersPage = () => {
               <label htmlFor="m-phone">Phone</label>
               <input
                 id="m-phone"
+                className="brutal-input"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
@@ -154,6 +157,7 @@ const MembersPage = () => {
               <label htmlFor="m-plan">Membership</label>
               <select
                 id="m-plan"
+                className="brutal-input"
                 name="membershipType"
                 value={form.membershipType}
                 onChange={handleChange}
@@ -167,6 +171,7 @@ const MembersPage = () => {
               <label htmlFor="m-status">Status</label>
               <select
                 id="m-status"
+                className="brutal-input"
                 name="status"
                 value={form.status}
                 onChange={handleChange}
@@ -177,13 +182,17 @@ const MembersPage = () => {
             </div>
           </div>
           <div className="form-actions">
-            <button type="submit" className="btn btn--primary" disabled={saving}>
+            <button
+              type="submit"
+              className="brutal-button brutal-button--primary"
+              disabled={saving}
+            >
               {saving ? 'Saving…' : editingId ? 'Update' : 'Add'}
             </button>
             {editingId && (
               <button
                 type="button"
-                className="btn btn--ghost"
+                className="brutal-button brutal-button--ghost"
                 onClick={() => {
                   setForm(initialForm);
                   setEditingId(null);
