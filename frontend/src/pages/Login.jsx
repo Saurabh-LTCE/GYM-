@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { signInWithPopup } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../firebase';
 import { authService } from '../services/authService';
@@ -16,58 +20,162 @@ const GoogleIcon = () => (
 
 const Login = () => {
   const navigate = useNavigate();
+  const [isSignupMode, setIsSignupMode] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  const getSelectedRole = () => {
+    const role = localStorage.getItem('selected_role');
+    if (!role) {
+      throw new Error('Please select a role before login.');
+    }
+    return role;
+  };
+
   const redirectByRole = (role) => {
     if (role === 'admin') {
-      navigate('/admin', { replace: true });
+      navigate('/dashboard', { replace: true });
       return;
     }
     if (role === 'trainer') {
-      navigate('/trainer', { replace: true });
+      navigate('/trainer-dashboard', { replace: true });
       return;
     }
     if (role === 'member') {
-      navigate('/member', { replace: true });
+      navigate('/member-dashboard', { replace: true });
       return;
     }
     throw new Error('Unsupported role received from backend.');
   };
 
-  const handleGoogleLogin = async () => {
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const finalizeBackendLogin = async (firebaseUser, fallbackName = '') => {
+    const role = getSelectedRole();
+    const payload = {
+      name:
+        firebaseUser.displayName ||
+        fallbackName ||
+        firebaseUser.email?.split('@')[0] ||
+        'Gym User',
+      email: firebaseUser.email,
+      uid: firebaseUser.uid,
+      role,
+    };
+
+    const backendData = await authService.firebaseLogin(payload);
+    const token = backendData?.token;
+    const user = backendData?.user;
+
+    if (!token || !user?.role) {
+      throw new Error('Invalid response from backend auth API.');
+    }
+
+    localStorage.setItem('gym_token', token);
+    localStorage.setItem('gym_user', JSON.stringify(user));
+    redirectByRole(user.role.toLowerCase());
+  };
+
+  const withAuthHandler = async (authAction, genericMessage) => {
     setErrorMessage('');
     setLoading(true);
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const idToken = await result.user.getIdToken();
-      const backendData = await authService.googleLogin(idToken);
-      const user = backendData?.user ?? backendData;
-
-      if (!user?.role) {
-        throw new Error('Role missing in login response.');
-      }
-
-      localStorage.setItem('gym_user', JSON.stringify(user));
-      redirectByRole(user.role);
+      await authAction();
     } catch (error) {
       setErrorMessage(
-        error?.response?.data?.message ||
-          error?.message ||
-          'Google sign in failed. Please try again.'
+        error?.response?.data?.message || error?.message || genericMessage
       );
     } finally {
       setLoading(false);
     }
   };
 
+  const handleGoogleLogin = async () => {
+    await withAuthHandler(async () => {
+      const result = await signInWithPopup(auth, googleProvider);
+      await finalizeBackendLogin(result.user);
+    }, 'Google sign in failed. Please try again.');
+  };
+
+  const handleEmailAuth = async (event) => {
+    event.preventDefault();
+    await withAuthHandler(async () => {
+      const { email, password, name } = formData;
+      let credentials;
+
+      if (isSignupMode) {
+        credentials = await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        credentials = await signInWithEmailAndPassword(auth, email, password);
+      }
+
+      await finalizeBackendLogin(credentials.user, name.trim());
+    }, 'Email authentication failed. Please try again.');
+  };
+
   return (
     <div className="auth-screen">
       <section className="auth-card">
-        <p className="auth-chip">Neobrutal Fitness Suite</p>
+        <p className="auth-chip">
+          Role: {(localStorage.getItem('selected_role') || 'none').toUpperCase()}
+        </p>
         <h1>Gym Management System</h1>
         <p className="auth-subtitle">Welcome back! Manage your fitness journey</p>
 
+        <form className="auth-form" onSubmit={handleEmailAuth}>
+          {isSignupMode && (
+            <input
+              className="auth-input"
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          )}
+          <input
+            className="auth-input"
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            className="auth-input"
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            minLength={6}
+          />
+
+          <button
+            type="submit"
+            className="google-login-btn auth-primary-btn"
+            disabled={loading}
+          >
+            {loading
+              ? 'Please wait...'
+              : isSignupMode
+                ? 'Create Account'
+                : 'Login with Email'}
+          </button>
+        </form>
+
+        <p className="auth-divider">OR</p>
         <button
           type="button"
           className="google-login-btn"
@@ -78,6 +186,15 @@ const Login = () => {
             <GoogleIcon />
           </span>
           <span>{loading ? 'Signing in...' : 'Continue with Google'}</span>
+        </button>
+
+        <button
+          type="button"
+          className="auth-switch-btn"
+          onClick={() => setIsSignupMode((prev) => !prev)}
+          disabled={loading}
+        >
+          {isSignupMode ? 'Already have an account? Login' : "Don't have an account? Sign up"}
         </button>
 
         {errorMessage && (

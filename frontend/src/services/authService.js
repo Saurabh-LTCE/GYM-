@@ -1,8 +1,8 @@
 import api from './api';
 
 export const authService = {
-  googleLogin: async (idToken) => {
-    const response = await api.post('/api/auth/google', { token: idToken });
+  firebaseLogin: async ({ name, email, uid, role }) => {
+    const response = await api.post('/api/auth/firebase', { name, email, uid, role });
     return response.data;
   },
   getTrainerMembers: async () => {

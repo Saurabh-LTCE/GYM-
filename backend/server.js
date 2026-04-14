@@ -6,6 +6,7 @@ const connectDB = require('./config/db');
 const memberRoutes = require('./routes/memberRoutes.js');
 const trainerRoutes = require('./routes/trainerRoutes.js');
 const feeRoutes = require('./routes/feeRoutes.js');
+const authRoutes = require('./routes/authRoutes.js');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use('/api/members', memberRoutes);
 app.use('/api/trainers', trainerRoutes);
 app.use('/api/fees', feeRoutes);
+app.use('/api/auth', authRoutes);
 
 // Health check route
 app.get('/', (req, res) => {

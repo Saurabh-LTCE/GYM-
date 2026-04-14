@@ -87,8 +87,84 @@
   font-weight: 700;
 }
 
+.role-card {
+  background: #fff;
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.role-btn {
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0 #000;
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 1rem 0.75rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.role-btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0 #000;
+}
+
+.role-btn--yellow {
+  background: #ffef66;
+}
+
+.role-btn--blue {
+  background: #8ec9ff;
+}
+
+.role-btn--pink {
+  background: #ff9ac3;
+}
+
+.auth-form {
+  display: grid;
+  gap: 0.65rem;
+  margin-bottom: 0.8rem;
+}
+
+.auth-input {
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0 #000;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.75rem 0.8rem;
+}
+
+.auth-divider {
+  margin: 0.75rem 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.auth-primary-btn {
+  background: #8ec9ff;
+}
+
+.auth-switch-btn {
+  width: 100%;
+  margin-top: 0.7rem;
+  border: 0;
+  background: transparent;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 @media (max-width: 640px) {
   .auth-card {
     padding: 1.5rem;
+  }
+
+  .role-grid {
+    grid-template-columns: 1fr;
   }
 }

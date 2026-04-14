@@ -2,10 +2,10 @@ import axios from 'axios';
 
 /**
  * Axios instance for the Gym Management backend.
- * Base URL comes from Vite env (configure in .env as VITE_API_BASE_URL).
+ * Base URL comes from Vite env.
  */
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '',
+  baseURL: import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '',
   headers: {
     'Content-Type': 'application/json',
   },
