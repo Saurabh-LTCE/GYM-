@@ -1,0 +1,85 @@
+.role-dashboard {
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.role-dashboard--trainer {
+  background: #fff4a8;
+}
+
+.role-dashboard--member {
+  background: #b8dcff;
+}
+
+.role-dashboard__header h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 4vw, 2.35rem);
+  font-weight: 800;
+}
+
+.role-dashboard__header p {
+  margin: 0.7rem 0 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.role-dashboard__notice,
+.role-dashboard__error {
+  border: 3px solid #000;
+  box-shadow: 5px 5px 0 #000;
+  padding: 0.85rem 1rem;
+  font-weight: 700;
+  background: #fff;
+  margin-bottom: 1rem;
+}
+
+.role-dashboard__error {
+  background: #ff9ac3;
+}
+
+.trainer-member-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.trainer-member-card {
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0 #000;
+  background: #fff;
+  padding: 1rem;
+}
+
+.trainer-member-card h3 {
+  margin: 0 0 0.7rem;
+  font-weight: 800;
+}
+
+.trainer-member-card p {
+  margin: 0.4rem 0;
+  font-weight: 700;
+}
+
+.member-profile-card {
+  width: min(520px, 100%);
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0 #000;
+  background: #fff;
+  padding: 1.1rem;
+}
+
+.member-profile-card h2 {
+  margin: 0 0 0.8rem;
+  font-weight: 800;
+}
+
+.member-profile-card p {
+  margin: 0.5rem 0;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .role-dashboard {
+    padding: 1rem;
+  }
+}

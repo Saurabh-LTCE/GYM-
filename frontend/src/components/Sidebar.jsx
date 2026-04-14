@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { IconDashboard, IconMembers, IconTrainers, IconFees } from './Icons';
 
 const navItems = [
-  { to: '/', label: 'Dashboard', end: true, Icon: IconDashboard },
+  { to: '/admin', label: 'Dashboard', end: true, Icon: IconDashboard },
   { to: '/members', label: 'Members', Icon: IconMembers },
   { to: '/trainers', label: 'Trainers', Icon: IconTrainers },
   { to: '/fees', label: 'Fees', Icon: IconFees },

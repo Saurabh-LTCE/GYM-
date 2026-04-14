@@ -7,7 +7,7 @@ Tech Stack:
 Frontend: React.js with React Router and Axios
 Backend: Node.js with Express.js
 Database: MongoDB (using MongoDB Atlas)
-Authentication: JWT with bcrypt password hashing
+Authentication: firebase only for "Continue with google option" but data should be store in MongoDB
 
 Project Structure:
 Frontend and backend are separate projects.
