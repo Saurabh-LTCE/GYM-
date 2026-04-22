@@ -7,8 +7,12 @@ const initialForm = {
   name: '',
   email: '',
   phone: '',
-  membershipType: 'Monthly',
-  status: 'Active',
+  age: '',
+  gender: 'prefer_not_to_say',
+  membershipPlan: 'basic',
+  joiningDate: '',
+  assignedTrainer: '',
+  feeStatus: 'pending',
 };
 
 const MembersPage = () => {
@@ -16,6 +20,7 @@ const MembersPage = () => {
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const rows = Array.isArray(data) ? data : [];
 
@@ -27,18 +32,24 @@ const MembersPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
+    setSubmitError('');
     try {
+      const payload = {
+        ...form,
+        age: form.age === '' ? null : Number(form.age),
+        assignedTrainer: form.assignedTrainer || null,
+        joiningDate: form.joiningDate || undefined,
+      };
       if (editingId) {
-        await membersService.update(editingId, form);
+        await membersService.update(editingId, payload);
       } else {
-        await membersService.create(form);
+        await membersService.create(payload);
       }
       setForm(initialForm);
       setEditingId(null);
       await refetch();
     } catch (err) {
-      console.error(err);
-      alert('Could not save member. Check the console.');
+      setSubmitError(err?.response?.data?.message || 'Could not save member.');
     } finally {
       setSaving(false);
     }
@@ -49,8 +60,12 @@ const MembersPage = () => {
       name: row.name,
       email: row.email,
       phone: row.phone,
-      membershipType: row.membershipType,
-      status: row.status,
+      age: row.age ?? '',
+      gender: row.gender || 'prefer_not_to_say',
+      membershipPlan: row.membershipPlan || 'basic',
+      joiningDate: row.joiningDate ? new Date(row.joiningDate).toISOString().slice(0, 10) : '',
+      assignedTrainer: row.assignedTrainer?._id || row.assignedTrainer || '',
+      feeStatus: row.feeStatus || 'pending',
     });
     setEditingId(row._id);
   };
@@ -61,8 +76,7 @@ const MembersPage = () => {
       await membersService.remove(id);
       await refetch();
     } catch (err) {
-      console.error(err);
-      alert('Could not delete member.');
+      setSubmitError(err?.response?.data?.message || 'Could not delete member.');
     }
   };
 
@@ -70,13 +84,13 @@ const MembersPage = () => {
     { key: 'name', header: 'Name' },
     { key: 'email', header: 'Email' },
     { key: 'phone', header: 'Phone' },
-    { key: 'membershipType', header: 'Plan' },
-    { key: 'status', header: 'Status' },
+    { key: 'membershipPlan', header: 'Plan' },
+    { key: 'feeStatus', header: 'Fee Status' },
     {
-      key: 'joinDate',
+      key: 'joiningDate',
       header: 'Joined',
       render: (row) =>
-        row.joinDate ? new Date(row.joinDate).toLocaleDateString() : '—',
+        row.joiningDate ? new Date(row.joiningDate).toLocaleDateString() : '—',
     },
     {
       key: '_actions',
@@ -112,6 +126,11 @@ const MembersPage = () => {
       {error && (
         <div className="error-banner" role="alert">
           Failed to load members. Is the backend running?
+        </div>
+      )}
+      {submitError && (
+        <div className="error-banner" role="alert">
+          {submitError}
         </div>
       )}
 
@@ -154,30 +173,80 @@ const MembersPage = () => {
               />
             </div>
             <div className="form-field">
+              <label htmlFor="m-age">Age</label>
+              <input
+                id="m-age"
+                className="brutal-input"
+                type="number"
+                min="0"
+                name="age"
+                value={form.age}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="m-gender">Gender</label>
+              <select
+                id="m-gender"
+                className="brutal-input"
+                name="gender"
+                value={form.gender}
+                onChange={handleChange}
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+                <option value="prefer_not_to_say">Prefer not to say</option>
+              </select>
+            </div>
+            <div className="form-field">
               <label htmlFor="m-plan">Membership</label>
               <select
                 id="m-plan"
                 className="brutal-input"
-                name="membershipType"
-                value={form.membershipType}
+                name="membershipPlan"
+                value={form.membershipPlan}
                 onChange={handleChange}
               >
-                <option value="Monthly">Monthly</option>
-                <option value="Quarterly">Quarterly</option>
-                <option value="Yearly">Yearly</option>
+                <option value="basic">Basic</option>
+                <option value="standard">Standard</option>
+                <option value="premium">Premium</option>
               </select>
             </div>
             <div className="form-field">
-              <label htmlFor="m-status">Status</label>
-              <select
-                id="m-status"
+              <label htmlFor="m-joining-date">Joining Date</label>
+              <input
+                id="m-joining-date"
                 className="brutal-input"
-                name="status"
-                value={form.status}
+                type="date"
+                name="joiningDate"
+                value={form.joiningDate}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="m-trainer-id">Assigned Trainer ID</label>
+              <input
+                id="m-trainer-id"
+                className="brutal-input"
+                name="assignedTrainer"
+                value={form.assignedTrainer}
+                onChange={handleChange}
+                placeholder="Optional trainer ObjectId"
+              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="m-fee-status">Fee Status</label>
+              <select
+                id="m-fee-status"
+                className="brutal-input"
+                name="feeStatus"
+                value={form.feeStatus}
                 onChange={handleChange}
               >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+                <option value="overdue">Overdue</option>
               </select>
             </div>
           </div>

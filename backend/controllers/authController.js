@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User.js');
+const Member = require('../models/Member.js');
+const Trainer = require('../models/Trainer.js');
 
 const VALID_ROLES = ['admin', 'trainer', 'member'];
 
@@ -40,8 +42,40 @@ exports.firebaseAuth = async (req, res, next) => {
       await user.save();
     }
 
+    let profile = null;
+    let profileModel = null;
+
+    if (normalizedRole === 'member') {
+      profileModel = 'member';
+      profile = await Member.findOne({ email: normalizedEmail });
+      if (!profile) {
+        profile = await Member.create({
+          name: normalizedName,
+          email: normalizedEmail,
+          joiningDate: new Date(),
+        });
+      }
+    } else if (normalizedRole === 'trainer') {
+      profileModel = 'trainer';
+      profile = await Trainer.findOne({ email: normalizedEmail });
+      if (!profile) {
+        profile = await Trainer.create({
+          name: normalizedName,
+          email: normalizedEmail,
+          specialization: 'General Fitness',
+          joiningDate: new Date(),
+        });
+      }
+    }
+
     const token = jwt.sign(
-      { userId: user._id, email: user.email, role: user.role },
+      {
+        userId: user._id,
+        email: user.email,
+        role: user.role,
+        profileId: profile?._id || null,
+        profileModel,
+      },
       process.env.JWT_SECRET || 'gym-fallback-secret',
       { expiresIn: '7d' }
     );
@@ -49,10 +83,14 @@ exports.firebaseAuth = async (req, res, next) => {
     return res.status(200).json({
       token,
       user: {
+        id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
+        profileId: profile?._id || null,
+        profileModel,
       },
+      profile,
     });
   } catch (error) {
     next(error);

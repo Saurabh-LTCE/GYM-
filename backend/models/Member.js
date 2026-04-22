@@ -16,22 +16,38 @@ const memberSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: true,
+      default: '',
       trim: true,
     },
-    membershipType: {
-      type: String,
-      enum: ['Monthly', 'Quarterly', 'Yearly'],
-      default: 'Monthly',
+    age: {
+      type: Number,
+      min: 0,
+      max: 120,
+      default: null,
     },
-    joinDate: {
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other', 'prefer_not_to_say'],
+      default: 'prefer_not_to_say',
+    },
+    membershipPlan: {
+      type: String,
+      enum: ['basic', 'standard', 'premium'],
+      default: 'basic',
+    },
+    joiningDate: {
       type: Date,
       default: Date.now,
     },
-    status: {
+    assignedTrainer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Trainer',
+      default: null,
+    },
+    feeStatus: {
       type: String,
-      enum: ['Active', 'Inactive'],
-      default: 'Active',
+      enum: ['paid', 'pending', 'overdue'],
+      default: 'pending',
     },
   },
   {

@@ -1,7 +1,7 @@
 const express = require('express');
 const {
   createMember,
-  getMembers,
+  getAllMembers,
   getMemberById,
   updateMember,
   deleteMember,
@@ -9,7 +9,7 @@ const {
 
 const router = express.Router();
 
-router.route('/').get(getMembers).post(createMember);
+router.route('/').get(getAllMembers).post(createMember);
 
 router.route('/:id').get(getMemberById).put(updateMember).delete(deleteMember);
 

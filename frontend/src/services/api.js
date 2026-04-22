@@ -11,6 +11,14 @@ const api = axios.create({
   },
 });
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('gym_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 /** Resource paths — backend uses /api/* */
 export const API_PATHS = {
   members: '/api/members',
@@ -20,6 +28,7 @@ export const API_PATHS = {
 
 export const membersService = {
   getAll: () => api.get(API_PATHS.members).then((res) => res.data),
+  getById: (id) => api.get(`${API_PATHS.members}/${id}`).then((res) => res.data),
   create: (body) => api.post(API_PATHS.members, body).then((res) => res.data),
   update: (id, body) =>
     api.put(`${API_PATHS.members}/${id}`, body).then((res) => res.data),
@@ -28,6 +37,7 @@ export const membersService = {
 
 export const trainersService = {
   getAll: () => api.get(API_PATHS.trainers).then((res) => res.data),
+  getById: (id) => api.get(`${API_PATHS.trainers}/${id}`).then((res) => res.data),
   create: (body) => api.post(API_PATHS.trainers, body).then((res) => res.data),
   update: (id, body) =>
     api.put(`${API_PATHS.trainers}/${id}`, body).then((res) => res.data),

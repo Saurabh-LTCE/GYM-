@@ -16,7 +16,7 @@ const trainerSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: true,
+      default: '',
       trim: true,
     },
     specialization: {
@@ -24,14 +24,25 @@ const trainerSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    joinedOn: {
+    experience: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+    salary: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+    assignedMembers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Member',
+      },
+    ],
+    joiningDate: {
       type: Date,
       default: Date.now,
-    },
-    status: {
-      type: String,
-      enum: ['Active', 'Inactive'],
-      default: 'Active',
     },
   },
   {

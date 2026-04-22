@@ -8,7 +8,10 @@ const initialForm = {
   email: '',
   phone: '',
   specialization: '',
-  status: 'Active',
+  experience: '',
+  salary: '',
+  assignedMembers: '',
+  joiningDate: '',
 };
 
 const TrainersPage = () => {
@@ -16,6 +19,7 @@ const TrainersPage = () => {
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const rows = Array.isArray(data) ? data : [];
 
@@ -27,18 +31,27 @@ const TrainersPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
+    setSubmitError('');
     try {
+      const payload = {
+        ...form,
+        experience: form.experience === '' ? 0 : Number(form.experience),
+        salary: form.salary === '' ? 0 : Number(form.salary),
+        assignedMembers: form.assignedMembers
+          ? form.assignedMembers.split(',').map((item) => item.trim()).filter(Boolean)
+          : [],
+        joiningDate: form.joiningDate || undefined,
+      };
       if (editingId) {
-        await trainersService.update(editingId, form);
+        await trainersService.update(editingId, payload);
       } else {
-        await trainersService.create(form);
+        await trainersService.create(payload);
       }
       setForm(initialForm);
       setEditingId(null);
       await refetch();
     } catch (err) {
-      console.error(err);
-      alert('Could not save trainer.');
+      setSubmitError(err?.response?.data?.message || 'Could not save trainer.');
     } finally {
       setSaving(false);
     }
@@ -50,7 +63,15 @@ const TrainersPage = () => {
       email: row.email,
       phone: row.phone,
       specialization: row.specialization,
-      status: row.status,
+      experience: row.experience ?? '',
+      salary: row.salary ?? '',
+      assignedMembers: Array.isArray(row.assignedMembers)
+        ? row.assignedMembers
+            .map((member) => (typeof member === 'string' ? member : member?._id))
+            .filter(Boolean)
+            .join(', ')
+        : '',
+      joiningDate: row.joiningDate ? new Date(row.joiningDate).toISOString().slice(0, 10) : '',
     });
     setEditingId(row._id);
   };
@@ -61,8 +82,7 @@ const TrainersPage = () => {
       await trainersService.remove(id);
       await refetch();
     } catch (err) {
-      console.error(err);
-      alert('Could not delete trainer.');
+      setSubmitError(err?.response?.data?.message || 'Could not delete trainer.');
     }
   };
 
@@ -71,12 +91,13 @@ const TrainersPage = () => {
     { key: 'email', header: 'Email' },
     { key: 'phone', header: 'Phone' },
     { key: 'specialization', header: 'Specialization' },
-    { key: 'status', header: 'Status' },
+    { key: 'experience', header: 'Experience (yrs)' },
+    { key: 'salary', header: 'Salary' },
     {
-      key: 'joinedOn',
-      header: 'Joined',
+      key: 'assignedMembers',
+      header: 'Assigned Members',
       render: (row) =>
-        row.joinedOn ? new Date(row.joinedOn).toLocaleDateString() : '—',
+        Array.isArray(row.assignedMembers) ? row.assignedMembers.length : 0,
     },
     {
       key: '_actions',
@@ -112,6 +133,11 @@ const TrainersPage = () => {
       {error && (
         <div className="error-banner" role="alert">
           Failed to load trainers.
+        </div>
+      )}
+      {submitError && (
+        <div className="error-banner" role="alert">
+          {submitError}
         </div>
       )}
 
@@ -165,17 +191,50 @@ const TrainersPage = () => {
               />
             </div>
             <div className="form-field">
-              <label htmlFor="t-status">Status</label>
-              <select
-                id="t-status"
+              <label htmlFor="t-exp">Experience (years)</label>
+              <input
+                id="t-exp"
                 className="brutal-input"
-                name="status"
-                value={form.status}
+                type="number"
+                min="0"
+                name="experience"
+                value={form.experience}
                 onChange={handleChange}
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
+              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="t-salary">Salary</label>
+              <input
+                id="t-salary"
+                className="brutal-input"
+                type="number"
+                min="0"
+                name="salary"
+                value={form.salary}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="t-members">Assigned Member IDs</label>
+              <input
+                id="t-members"
+                className="brutal-input"
+                name="assignedMembers"
+                value={form.assignedMembers}
+                onChange={handleChange}
+                placeholder="Comma separated member ObjectIds"
+              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="t-joining-date">Joining Date</label>
+              <input
+                id="t-joining-date"
+                className="brutal-input"
+                type="date"
+                name="joiningDate"
+                value={form.joiningDate || ''}
+                onChange={handleChange}
+              />
             </div>
           </div>
           <div className="form-actions">

@@ -1,6 +1,5 @@
 const Trainer = require('../models/Trainer.js');
 
-// Create trainer
 exports.createTrainer = async (req, res, next) => {
   try {
     const trainer = await Trainer.create(req.body);
@@ -10,8 +9,7 @@ exports.createTrainer = async (req, res, next) => {
   }
 };
 
-// Get all trainers
-exports.getTrainers = async (req, res, next) => {
+exports.getAllTrainers = async (req, res, next) => {
   try {
     const trainers = await Trainer.find().sort({ createdAt: -1 });
     res.json(trainers);
@@ -20,7 +18,6 @@ exports.getTrainers = async (req, res, next) => {
   }
 };
 
-// Get single trainer
 exports.getTrainerById = async (req, res, next) => {
   try {
     const trainer = await Trainer.findById(req.params.id);
@@ -33,7 +30,6 @@ exports.getTrainerById = async (req, res, next) => {
   }
 };
 
-// Update trainer
 exports.updateTrainer = async (req, res, next) => {
   try {
     const trainer = await Trainer.findByIdAndUpdate(
@@ -53,7 +49,6 @@ exports.updateTrainer = async (req, res, next) => {
   }
 };
 
-// Delete trainer
 exports.deleteTrainer = async (req, res, next) => {
   try {
     const trainer = await Trainer.findByIdAndDelete(req.params.id);

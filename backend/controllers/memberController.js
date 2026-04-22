@@ -1,6 +1,5 @@
 const Member = require('../models/Member.js');
 
-// Create member
 exports.createMember = async (req, res, next) => {
   try {
     const member = await Member.create(req.body);
@@ -10,8 +9,7 @@ exports.createMember = async (req, res, next) => {
   }
 };
 
-// Get all members
-exports.getMembers = async (req, res, next) => {
+exports.getAllMembers = async (req, res, next) => {
   try {
     const members = await Member.find().sort({ createdAt: -1 });
     res.json(members);
@@ -20,7 +18,6 @@ exports.getMembers = async (req, res, next) => {
   }
 };
 
-// Get single member
 exports.getMemberById = async (req, res, next) => {
   try {
     const member = await Member.findById(req.params.id);
@@ -33,7 +30,6 @@ exports.getMemberById = async (req, res, next) => {
   }
 };
 
-// Update member
 exports.updateMember = async (req, res, next) => {
   try {
     const member = await Member.findByIdAndUpdate(req.params.id, req.body, {
@@ -49,7 +45,6 @@ exports.updateMember = async (req, res, next) => {
   }
 };
 
-// Delete member
 exports.deleteMember = async (req, res, next) => {
   try {
     const member = await Member.findByIdAndDelete(req.params.id);

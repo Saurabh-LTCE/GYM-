@@ -1,7 +1,7 @@
 const express = require('express');
 const {
   createTrainer,
-  getTrainers,
+  getAllTrainers,
   getTrainerById,
   updateTrainer,
   deleteTrainer,
@@ -9,7 +9,7 @@ const {
 
 const router = express.Router();
 
-router.route('/').get(getTrainers).post(createTrainer);
+router.route('/').get(getAllTrainers).post(createTrainer);
 
 router
   .route('/:id')

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { authService } from '../services/authService';
+import { useAuth } from '../context/AuthContext';
 import '../styles/role-dashboards.css';
 
 const toDate = (value) => {
@@ -8,35 +8,30 @@ const toDate = (value) => {
 };
 
 const TrainerDashboard = () => {
-  const [members, setMembers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { user, profile, profileLoading, loadProfile } = useAuth();
+  const [members, setMembers] = useState(profile?.assignedMembers || []);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    const loadMembers = async () => {
-      setLoading(true);
-      setErrorMessage('');
-      try {
-        const data = await authService.getTrainerMembers();
-        const rows = Array.isArray(data?.members)
-          ? data.members
-          : Array.isArray(data)
-            ? data
-            : [];
-        setMembers(rows);
-      } catch (error) {
-        setErrorMessage(
-          error?.response?.data?.message ||
-            error?.message ||
-            'Could not load assigned members.'
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (profile?.assignedMembers) {
+      setMembers(profile.assignedMembers);
+      return;
+    }
 
-    loadMembers();
-  }, []);
+    if (user?.role === 'trainer' && user?.profileId) {
+      loadProfile()
+        .then((loaded) => {
+          setMembers(Array.isArray(loaded?.assignedMembers) ? loaded.assignedMembers : []);
+        })
+        .catch((error) => {
+          setErrorMessage(
+            error?.response?.data?.message ||
+              error?.message ||
+              'Could not load assigned members.'
+          );
+        });
+    }
+  }, [user, profile, loadProfile]);
 
   return (
     <div className="role-dashboard role-dashboard--trainer">
@@ -45,7 +40,7 @@ const TrainerDashboard = () => {
         <p>Track your assigned members and their active plans.</p>
       </div>
 
-      {loading && <div className="role-dashboard__notice">Loading members...</div>}
+      {profileLoading && <div className="role-dashboard__notice">Loading members...</div>}
 
       {errorMessage && (
         <div className="role-dashboard__error" role="alert">
@@ -53,7 +48,7 @@ const TrainerDashboard = () => {
         </div>
       )}
 
-      {!loading && !errorMessage && (
+      {!profileLoading && !errorMessage && (
         <div className="trainer-member-grid">
           {members.length === 0 && (
             <div className="role-dashboard__notice">No members assigned yet.</div>

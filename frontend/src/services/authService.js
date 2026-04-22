@@ -5,32 +5,12 @@ export const authService = {
     const response = await api.post('/api/auth/firebase', { name, email, uid, role });
     return response.data;
   },
-  getTrainerMembers: async () => {
-    const endpoints = ['/api/trainers/me/members', '/api/trainers/assigned-members'];
-    for (const endpoint of endpoints) {
-      try {
-        const response = await api.get(endpoint);
-        return response.data;
-      } catch (error) {
-        if (error?.response?.status !== 404) {
-          throw error;
-        }
-      }
-    }
-    throw new Error('Could not load trainer members from configured endpoints.');
+  getTrainerById: async (id) => {
+    const response = await api.get(`/api/trainers/${id}`);
+    return response.data;
   },
-  getMemberProfile: async () => {
-    const endpoints = ['/api/members/me', '/api/users/me'];
-    for (const endpoint of endpoints) {
-      try {
-        const response = await api.get(endpoint);
-        return response.data;
-      } catch (error) {
-        if (error?.response?.status !== 404) {
-          throw error;
-        }
-      }
-    }
-    throw new Error('Could not load member profile from configured endpoints.');
+  getMemberById: async (id) => {
+    const response = await api.get(`/api/members/${id}`);
+    return response.data;
   },
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { authService } from '../services/authService';
+import { useAuth } from '../context/AuthContext';
 import '../styles/role-dashboards.css';
 
 const toDate = (value) => {
@@ -8,30 +8,16 @@ const toDate = (value) => {
 };
 
 const MemberDashboard = () => {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
+  const { user, profile, profileLoading, profileError, loadProfile } = useAuth();
+  const [errorMessage, setErrorMessage] = useState(profileError);
 
   useEffect(() => {
-    const loadProfile = async () => {
-      setLoading(true);
-      setErrorMessage('');
-      try {
-        const data = await authService.getMemberProfile();
-        setProfile(data?.member || data?.user || data);
-      } catch (error) {
-        setErrorMessage(
-          error?.response?.data?.message ||
-            error?.message ||
-            'Could not load member details.'
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProfile();
-  }, []);
+    if (user?.role === 'member' && user?.profileId && !profile) {
+      loadProfile().catch((error) =>
+        setErrorMessage(error?.response?.data?.message || error?.message)
+      );
+    }
+  }, [user, profile, loadProfile]);
 
   return (
     <div className="role-dashboard role-dashboard--member">
@@ -40,7 +26,7 @@ const MemberDashboard = () => {
         <p>View your membership details and payment status.</p>
       </div>
 
-      {loading && <div className="role-dashboard__notice">Loading profile...</div>}
+      {profileLoading && <div className="role-dashboard__notice">Loading profile...</div>}
 
       {errorMessage && (
         <div className="role-dashboard__error" role="alert">
@@ -48,20 +34,17 @@ const MemberDashboard = () => {
         </div>
       )}
 
-      {!loading && !errorMessage && profile && (
+      {!profileLoading && !errorMessage && profile && (
         <article className="member-profile-card">
           <h2>{profile.name || 'Member'}</h2>
           <p>
-            <strong>Plan:</strong> {profile.plan || profile.membershipType || 'N/A'}
+            <strong>Plan:</strong> {profile.membershipPlan || 'N/A'}
           </p>
           <p>
-            <strong>Join Date:</strong> {toDate(profile.joinDate)}
+            <strong>Join Date:</strong> {toDate(profile.joiningDate)}
           </p>
           <p>
-            <strong>Expiry Date:</strong> {toDate(profile.expiryDate)}
-          </p>
-          <p>
-            <strong>Payment Status:</strong> {profile.paymentStatus || 'Pending'}
+            <strong>Payment Status:</strong> {profile.feeStatus || 'pending'}
           </p>
         </article>
       )}

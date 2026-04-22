@@ -7,6 +7,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../firebase';
 import { authService } from '../services/authService';
+import { useAuth } from '../context/AuthContext';
 import '../styles/auth.css';
 
 const GoogleIcon = () => (
@@ -20,6 +21,7 @@ const GoogleIcon = () => (
 
 const Login = () => {
   const navigate = useNavigate();
+  const { loginWithBackendData } = useAuth();
   const [isSignupMode, setIsSignupMode] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -38,16 +40,8 @@ const Login = () => {
   };
 
   const redirectByRole = (role) => {
-    if (role === 'admin') {
+    if (role === 'admin' || role === 'trainer' || role === 'member') {
       navigate('/dashboard', { replace: true });
-      return;
-    }
-    if (role === 'trainer') {
-      navigate('/trainer-dashboard', { replace: true });
-      return;
-    }
-    if (role === 'member') {
-      navigate('/member-dashboard', { replace: true });
       return;
     }
     throw new Error('Unsupported role received from backend.');
@@ -79,8 +73,7 @@ const Login = () => {
       throw new Error('Invalid response from backend auth API.');
     }
 
-    localStorage.setItem('gym_token', token);
-    localStorage.setItem('gym_user', JSON.stringify(user));
+    await loginWithBackendData(backendData);
     redirectByRole(user.role.toLowerCase());
   };
 
